@@ -6,7 +6,7 @@ export async function getAllUsers() {
     return response.data;
 }
 
-export async function createUser(data) {
-    const response = await axios.post(`/api/user`, { user: data });
+export async function createUser(email,usrPswdInpt) {
+    const response = await axios.post(`/api/registerUser`, { email,usrPswdInpt });
     return response.data;
 }
