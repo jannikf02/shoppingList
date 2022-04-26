@@ -48,14 +48,21 @@
         </v-row>
       </v-container>
     </v-main>
+    <PasswortModal/> 
   </v-app>
 </template>
 
 <script>
   import {getAllUsers} from './apiService/userService.js';
   console.log(getAllUsers());
+  import PasswortModal from './components/PasswortModal.vue';
+  
   export default {
     name:'app',
     data: () => ({ drawer: null }),
+    components: {
+    PasswortModal
+    }
+  
   }
 </script>
