@@ -5,9 +5,10 @@
     <PasswortModal v-if="state == 0" />
     <MenuBar v-if="state == 1" />
     <ContainerCon v-if="state == 1" />
+    </div>
     <FooterBar v-if="state == 1" />
     <CookieLaw v-if="state == 1" />
-    </div>
+    
   </v-app>
 </template>
 

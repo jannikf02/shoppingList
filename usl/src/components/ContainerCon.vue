@@ -12,16 +12,46 @@
               <strong>Einzukaufen:</strong>
             </v-col>
 
-            <v-col v-for="j in 2" :key="`${n}${j}`" cols="12" md="12">
-              <v-sheet height="150"></v-sheet>
+            <v-col v-for="j in 5" :key="`${n}${j}`" cols="12" md="12">
+              <v-divider></v-divider>
+              <v-sheet height="fit-content">
+                <v-row>
+                  <v-col class="d-flex col justify-center align-center">
+                    <div class="itemName">Salami</div>
+                  </v-col>
+                  <v-divider vertical></v-divider>
+                  <v-col class="d-flex col justify-center align-center">
+                    <div class="itemCount">5</div>
+                  </v-col>
+                  <v-divider vertical></v-divider>
+                  <v-col class="d-flex col justify-center align-center">
+                    <v-checkbox></v-checkbox>
+                  </v-col>
+                </v-row>
+              </v-sheet>
             </v-col>
 
             <v-col class="mt-2" cols="12">
               <strong>Eingekauft:</strong>
             </v-col>
 
-            <v-col v-for="j in 2" :key="`${n}${j}`" cols="12" md="12">
-              <v-sheet height="150"></v-sheet>
+            <v-col v-for="j in 5" :key="`${n}${j}`" cols="12" md="12">
+              <v-divider></v-divider>
+              <v-sheet height="fit-content">
+                <v-row>
+                  <v-col class="d-flex col justify-center align-center">
+                    <div class="itemName">Salami</div>
+                  </v-col>
+                  <v-divider vertical></v-divider>
+                  <v-col class="d-flex col justify-center align-center">
+                    <div class="itemCount">5</div>
+                  </v-col>
+                  <v-divider vertical></v-divider>
+                  <v-col class="d-flex col justify-center align-center">
+                    <v-checkbox></v-checkbox>
+                  </v-col>
+                </v-row>
+              </v-sheet>
             </v-col>
           </template>
         </v-row>
