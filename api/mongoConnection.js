@@ -65,3 +65,5 @@ async function insert(col, insert) {
     client.close();
     return result;
 }
+
+module.exports = {insert};

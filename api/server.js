@@ -1,4 +1,5 @@
-require("./mongoConnection");
+const mongo = require("./mongoConnection");
+const bcrypt = require('bcrypt');
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -34,7 +35,11 @@ app.listen(port, () => {
   console.log(`Server listening on the port::${port}`);
 });
 
-app.get("/api/registerUser", (req, res) => {
-  const hash = req.body.hash;
-  console.log(hash);
+app.post("/api/registerUser", async(req, res) => {
+  const usrPswdInpt = req.body.usrPswdInpt;
+  var salt = await bcrypt.genSalt(10);
+  var hash = await bcrypt.hash(usrPswdInpt, salt);
+  mongo.insert("user",{passwordHash:hash});
+  hash = undefined;
+  res.json("Hashed");
 })

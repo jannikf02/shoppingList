@@ -93,7 +93,7 @@
         bottom
         right
         fab
-        @click="
+        @click="sendData"
       >
         <v-icon>mdi-arrow-right</v-icon>
       </v-btn>
@@ -127,11 +127,11 @@
         }
         return "80%"
       },
-      methods:{
-        transfer: function(event){
-          
-        }
-      }
     },
+    methods:{
+      sendData: function(){
+        console.log("Data")
+      }
+    }
   }
 </script>
