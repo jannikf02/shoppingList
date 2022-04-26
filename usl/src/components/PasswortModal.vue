@@ -1,7 +1,7 @@
 <template>
   <v-row justify="center">
     <v-dialog
-        v-show="true"
+        v-model="dialog"
       hide-overlay
       transition="dialog-bottom-transition"
     >
@@ -17,7 +17,7 @@
           three-line
           subheader
         >
-          <v-subheader>LogIn für die Einkaufsliste</v-subheader>
+          <v-subheader>Log In für die Einkaufsliste</v-subheader>
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title>Bitte Ihren Zugangscode eingeben.</v-list-item-title>
