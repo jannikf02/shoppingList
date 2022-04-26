@@ -52,6 +52,8 @@
 </template>
 
 <script>
+  import {getAllUsers} from './apiService/userService.js';
+  console.log(getAllUsers());
   export default {
     name:'app',
     data: () => ({ drawer: null }),
