@@ -1,51 +1,40 @@
-const express = require('express');
+require("./mongoConnection");
+
+const express = require("express");
+const cookieParser = require("cookie-parser");
+
+const mongodb = require("mongodb");
+
 const randomId = require('random-id');
 const app = express(),
-      bodyParser = require("body-parser");
-      port = 3070;
+  bodyParser = require("body-parser");
+port = 3070;
 
-// place holder for the data
-const users = [
-  {
-    id: "1",
-    firstName: "first1",
-    lastName: "last1",
-    email: "abc@gmail.com"
-  },
-  {
-    id: "2",
-    firstName: "first2",
-    lastName: "last2",
-    email: "abc@gmail.com"
-  },
-  {
-    id: "34",
-    firstName: "first3",
-    lastName: "last3",
-    email: "abc@gmail.com3423432"
-  }
-];
-
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static(process.cwd() + '/my-app/dist'));
+app.use(express.static(process.cwd() + '/usl/dist'));
 
-app.get('/api/users', (req, res) => {
+/*app.get('/api/users', (req, res) => {
   console.log('api/users called!!!!!!!')
   res.json(users);
 });
 
-app.post('/api/user', (req, res) => {
-  const user = req.body.user;
-  user.id = randomId(10);
-  console.log('Adding user:::::', user);
-  users.push(user);
-  res.json("user addedd");
-});
 
-app.get('/', (req,res) => {
+app.get("/setCookie", (req, res) => {
+  res.cookie('name', 'value', { maxAge: 900000, httpOnly: true });
+  res.send('cookie set');
+})
+
+app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/my-app/dist/index.html');
 });
-
+*/
 app.listen(port, () => {
-    console.log(`Server listening on the port::${port}`);
+  console.log(`Server listening on the port::${port}`);
 });
+
+app.get("/api/registerUser", (req, res) => {
+  const hash = req.body.hash;
+  console.log(hash);
+})
