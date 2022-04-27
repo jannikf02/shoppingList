@@ -66,4 +66,4 @@ async function insert(col, insert) {
     return result;
 }
 
-module.exports = {insert};
+module.exports = {insert,get,update,remove};

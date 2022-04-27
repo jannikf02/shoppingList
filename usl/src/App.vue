@@ -13,16 +13,14 @@
 </template>
 
 <script>
-import { getAllUsers } from "./apiService/userService.js";
-console.log(getAllUsers());
+import { bus } from './main';
 import MainApp from "./components/MainApp.vue";
 import PasswortModal from "./components/PasswortModal.vue";
 import MenuBar from "./components/MenuBar.vue";
 import FooterBar from "./components/FooterBar.vue";
 import ContainerCon from "./components/ContainerCon.vue";
 import CookieLaw from "./components/CookieLaw.vue";
-
-
+import {isLoggedIn,createLoginUser} from "./apiService/userService";
 
 export default {
   name: "app",
@@ -34,7 +32,24 @@ export default {
     FooterBar,
     CookieLaw
   },
-  data: () => ({ drawer: null, state: 1 }),
+  data: () => ({ drawer: null, state: 0 }),
+  methods:{
+
+  },
+  async created(){
+    const loggedin = await isLoggedIn();
+    this.state = loggedin?1:0;
+    bus.$on("logIn",async(email,password)=>{
+      const loggedin = await isLoggedIn() 
+      if(!loggedin){
+        await createLoginUser(email,password);
+        if(!(await isLoggedIn())){
+          return;
+        }
+      }
+      this.state = 1;
+    })
+  }
 };
 </script>
 

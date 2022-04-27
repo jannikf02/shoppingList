@@ -1,12 +1,15 @@
 const axios = require('axios');
 
-export async function getAllUsers() {
-
-    const response = await axios.get('/api/users');
+export async function createLoginUser(email,usrPswdInpt) {
+    const response = await axios.post(`/api/registerUser`, { email,usrPswdInpt:usrPswdInpt });
+    if(response.data.error){
+        alert(response.data.msg);
+    }
     return response.data;
 }
 
-export async function createUser(email,usrPswdInpt) {
-    const response = await axios.post(`/api/registerUser`, { email,usrPswdInpt });
-    return response.data;
+
+export async function isLoggedIn(){
+    const response = await(axios.get("/api/isLoggedin"))
+    return response.data.loggedin
 }

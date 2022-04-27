@@ -5,6 +5,8 @@ import './assets/css/style.css'
 
 Vue.config.productionTip = false
 
+export var bus = new Vue();
+
 new Vue({
   vuetify,
   render: h => h(App)
