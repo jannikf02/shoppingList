@@ -32,7 +32,7 @@ export default {
     FooterBar,
     CookieLaw
   },
-  data: () => ({ drawer: null, state: 0 }),
+  data: () => ({ drawer: null, state: 1 }),
   methods:{
 
   },
