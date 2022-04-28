@@ -8,14 +8,29 @@ const mongodb = require("mongodb");
 
 const randomId = require('random-id');
 const { json } = require("express");
+const session = require("express-session");
+const MongoStore = require('connect-mongo');
+const fs = require("fs");
+const path = require("path");
+const dotenv = require('dotenv');
+dotenv.config();
+
 const app = express(),
-bodyParser = require("body-parser");
+  bodyParser = require("body-parser");
 port = 3070;
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(process.cwd() + '/usl/dist'));
+app.use(session({
+  secret: process.env.SECRET_KEY,
+  resave: true,
+  saveUninitialized: true,
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://usl:DasistkeingutesPasswort@10.0.0.203:27017/sessionStore?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false',
+  })
+}));
 
 /*
 app.get('/api/users', (req, res) => {
@@ -33,65 +48,51 @@ app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/my-app/dist/index.html');
 });
 */
-
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server listening on the port::${port}`);
 });
 
-app.post("/api/registerUser", async(req, res) => {
+app.post("/api/registerUser", async (req, res) => {
   const usrPswdInpt = req.body.usrPswdInpt;
   const email = req.body.email;
-  const result = await mongo.get("user",{email});
-  if(result.length != 0){
-    const isPswdCorrect = await bcrypt.compare(usrPswdInpt,result[0].passwordHash);
-    if(!isPswdCorrect)
-      return res.json({error:true,msg:'The password you entered is incorrect'});
-    return login(res,email);
+  const result = await mongo.get("user", { email });
+  if (result.length != 0) {
+    const isPswdCorrect = await bcrypt.compare(usrPswdInpt, result[0].passwordHash);
+    if (!isPswdCorrect)
+      return res.json({ error: true, msg: 'The password you entered is incorrect' });
+    return login(req, res, email, result[0]._id);
   }
 
   var passwordHash = await hashPassword(usrPswdInpt);
-  mongo.insert("user",{passwordHash,email});
+  const result_insert = await mongo.insert("user", { passwordHash, email });
   hash = undefined;
-  return login(res,email);
+  return login(req, res, email, result_insert.insertedIds[0]);
 })
 
-app.get("/api/isLoggedin",async (req,res)=>{
-  let token = req.cookies.sessionTokenToken;
-  let email = req.cookies.sessionTokenEmail;
-  if(token != undefined && email != undefined){
-    const data = await mongo.get("user",{email,token});
-    if( data.length > 0 ){
-      return res.json({error:false,loggedin:true});
-    }
-  }
-  res.json({error:false,loggedin:false});
+app.get("/api/isLoggedin", async (req, res) => {
+  res.json({ error: false, loggedin: req.session.uid != undefined });
 })
 
-app.get("/api/loggout",(req,res)=>{
-  res.cookie("sessionTokenEmail",0,{maxAge:0})
-  res.json("loggedout")
+app.get("/api/loggout", (req, res) => {
+  req.session.destroy();
+  res.send("loggedout")
 })
 
 async function hashPassword(usrPswdInpt) {
   return await bcrypt.hash(usrPswdInpt, await bcrypt.genSalt(10));
 }
 
-async function login(res,email){
-  let token = createSessionToken();
-  res.cookie('sessionTokenEmail', email, { maxAge: 999999999, httpOnly: true });
-  res.cookie('sessionTokenToken', token, { maxAge: 999999999, httpOnly: true });
-  mongo.update("user",{email},{token});
-  res.json({error:false,msg:"",loggedin:true})
+async function login(req, res, email, uID) {
+  req.session.email = email;
+  req.session.uid = uID;
+  res.json({ error: false, msg: "", loggedin: true })
 }
 
-const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&()?/#+-.,;:_<>|';
+app.get("/test", (req, res) => {
+  req.session.test = true;
+  res.json(req.session + "");
+})
+app.get("/test2", (req, res) => {
 
-function createSessionToken(){
-  let result = '$32$ses_';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < 32; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-
-    return result;
-}
+  res.json(req.session.test);
+})
