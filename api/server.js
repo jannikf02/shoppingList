@@ -17,7 +17,7 @@ dotenv.config();
 
 const app = express(),
   bodyParser = require("body-parser");
-port = 3070;
+port = process.env.PORT;
 
 const mongoStore = MongoStore.create({
   mongoUrl: process.env.SESSION_STORE_STRING,
@@ -37,41 +37,82 @@ app.use(express.static(process.cwd() + '/usl/dist'));
 app.use(session(session_options));
 
 app.listen(port, async () => {
-  console.log(`Server listening on the port::${port}`);
+  console.log(`API started. Listening for API Requests on Port ${port}`);
 });
 
+/*
+  This section is for the user login and registration routes
+*/
 app.post("/api/registerUser", async (req, res) => {
   const usrPswdInpt = req.body.usrPswdInpt;
   const email = req.body.email;
-  const result = await mongo.get("user", { email });
+  const result = await getUserFromEmail(email);
   if (result.length != 0) {
-    const isPswdCorrect = await bcrypt.compare(usrPswdInpt, result[0].passwordHash);
-    if (!isPswdCorrect)
-      return res.json({ error: true, msg: 'The password you entered is incorrect' });
+    const isPswdCorrect = await checkPassword(usrPswdInpt, result);
+    if (!isPswdCorrect) {
+      return jsonResult(res, true, 'The password you entered is incorrect', false, false);
+    }
     return login(req, res, email, result[0]._id);
   }
 
   var passwordHash = await hashPassword(usrPswdInpt);
-  const result_insert = await mongo.insert("user", { passwordHash, email });
-  hash = undefined;
+  const result_insert = await createUser(passwordHash, email);
   return login(req, res, email, result_insert.insertedIds[0]);
 })
 
 app.get("/api/isLoggedin", async (req, res) => {
-  res.json({ error: false, loggedin: req.session.uid != undefined });
+  jsonResult(res, false, "", req.session.uid != undefined, false);
 })
 
 app.get("/api/loggout", (req, res) => {
   req.session.destroy();
-  res.json({ error: false, msg: "", loggedin: false, loggedout: true })
+  jsonResult(res, false, "", false, true);
 })
+
+function createUser(passwordHash, email) {
+  return mongo.insert("user", { passwordHash, email });
+}
+
+async function getUserFromEmail(email) {
+  return await mongo.get("user", { email });
+}
+
+async function checkPassword(usrPswdInpt, result) {
+  return await bcrypt.compare(usrPswdInpt, result[0].passwordHash);
+}
 
 async function hashPassword(usrPswdInpt) {
   return await bcrypt.hash(usrPswdInpt, await bcrypt.genSalt(10));
 }
 
-async function login(req, res, email, uID) {
+function login(req, res, email, uID) {
   req.session.email = email;
   req.session.uid = uID;
   res.json({ error: false, msg: "", loggedin: true })
 }
+
+function jsonResult(res, error, msg, loggedin, loggedout) {
+  res.json({ error, msg, loggedin, loggedout })
+}
+
+/*
+  This section is for the shopping list routes
+*/
+
+app.get("/api/usl/list", (req, res) => {
+  mongo.get("list", { ownerMail: req.body.mail }).then(result => {
+    res.json(result.list);
+  })
+});
+
+app.post("/api/usl/list", (req, res) => {
+  const list = req.body.list;
+
+  const result = mongo.get("list", { ownerMail: list.ownerMail });
+  if (result.length == 0) {
+    mongo.insert("list", list);
+    return resultJson(false, "List created", true, false);
+  }
+  mongo.update("list", { ownerMail: list.ownerMail }, { list });
+});
+
