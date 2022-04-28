@@ -40,6 +40,9 @@ app.listen(port, async () => {
   console.log(`API started. Listening for API Requests on Port ${port}`);
 });
 
+/*
+  This section is for the user login and registration routes
+*/
 app.post("/api/registerUser", async (req, res) => {
   const usrPswdInpt = req.body.usrPswdInpt;
   const email = req.body.email;
@@ -47,7 +50,7 @@ app.post("/api/registerUser", async (req, res) => {
   if (result.length != 0) {
     const isPswdCorrect = await checkPassword(usrPswdInpt, result);
     if (!isPswdCorrect) {
-      return jsonResult(true, 'The password you entered is incorrect', false, false);
+      return jsonResult(res, true, 'The password you entered is incorrect', false, false);
     }
     return login(req, res, email, result[0]._id);
   }
@@ -58,12 +61,12 @@ app.post("/api/registerUser", async (req, res) => {
 })
 
 app.get("/api/isLoggedin", async (req, res) => {
-  jsonResult(false, "", req.session.uid != undefined, false);
+  jsonResult(res, false, "", req.session.uid != undefined, false);
 })
 
 app.get("/api/loggout", (req, res) => {
   req.session.destroy();
-  jsonResult(false, "", false, true);
+  jsonResult(res, false, "", false, true);
 })
 
 function createUser(passwordHash, email) {
@@ -88,6 +91,28 @@ function login(req, res, email, uID) {
   res.json({ error: false, msg: "", loggedin: true })
 }
 
-function jsonResult(error, msg, loggedin, loggedout) {
+function jsonResult(res, error, msg, loggedin, loggedout) {
   res.json({ error, msg, loggedin, loggedout })
 }
+
+/*
+  This section is for the shopping list routes
+*/
+
+app.get("/api/usl/list", (req, res) => {
+  mongo.get("list", { ownerMail: req.body.mail }).then(result => {
+    res.json(result.list);
+  })
+});
+
+app.post("/api/usl/list", (req, res) => {
+  const list = req.body.list;
+
+  const result = mongo.get("list", { ownerMail: list.ownerMail });
+  if (result.length == 0) {
+    mongo.insert("list", list);
+    return resultJson(false, "List created", true, false);
+  }
+  mongo.update("list", { ownerMail: list.ownerMail }, { list });
+});
+
