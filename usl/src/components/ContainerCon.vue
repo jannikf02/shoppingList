@@ -2,7 +2,7 @@
   <v-app id="inspire">
     <v-navigation-drawer v-model="drawer" fixed temporary>
       <!--  -->
-    </v-navigation-drawer> 
+    </v-navigation-drawer>
 
     <v-main class="grey lighten-2">
       <v-container>
@@ -56,19 +56,50 @@
           </template>
         </v-row>
         <v-row>
-                    <v-fab-transition>
-                        <v-btn
-                        v-show="!hidden"
-                        color="blue"
-                        dark
-                        fixed
-                        bottom
-                        right
-                        fab
-                        >
-                        <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                    </v-fab-transition>
+          <v-dialog v-model="dialog" max-width="600px" transition="dialog-bottom-transition">
+            <template v-slot:activator="{ on, attrs }">
+              <v-fab-transition>
+                <v-btn v-show="!hidden" color="blue" dark fixed bottom right fab v-bind="attrs" v-on="on">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </v-fab-transition>
+            </template>
+            <v-card>
+              <v-toolbar dark color="primary">
+                <v-btn icon dark v-on:click="dialog = false">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-toolbar-title>Hinzufügen</v-toolbar-title>
+              </v-toolbar>
+              <v-card-title>
+                <span class="text-h5">User Profile</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field label="Produkt" required></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select :items="items" label="Menge"></v-select>
+                    </v-col>
+                  </v-row>
+                </v-container>
+                <small>*indicates required field</small>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="onClickOutside">
+                  Close
+                </v-btn>
+                <v-btn color="blue darken-1" text @click="dialog = false">
+                  Save
+                </v-btn>
+              </v-card-actions>
+
+            </v-card>
+          </v-dialog>
+
         </v-row>
       </v-container>
     </v-main>
@@ -76,17 +107,32 @@
 </template>
 
 <script>
-export default {
-  name: "ContainerCon",
+  export default {
+    name: "ContainerCon",
 
-  data: () => ({
-    drawer: null,
-    icons: [
-      'mdi-facebook',
-      'mdi-twitter',
-      'mdi-linkedin',
-      'mdi-instagram',
-    ],
-  }),
-};
+    data: () => ({
+      dialog: false,
+      drawer: null,
+      icons: [
+        'mdi-facebook',
+        'mdi-twitter',
+        'mdi-linkedin',
+        'mdi-instagram',
+      ],
+      items: [
+
+      ]
+    }),
+    created() {
+      for (let i = 0; i < 30; i++) {
+        this.items.push({ text: `${i + 1}`, value: i + 1 });
+      }
+    }, 
+    methods: {
+      onClickOutside() {
+        this.dialog = false;
+      }
+    }
+    
+  };
 </script>
