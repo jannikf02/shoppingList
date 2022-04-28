@@ -19,35 +19,23 @@ const app = express(),
   bodyParser = require("body-parser");
 port = 3070;
 
+const mongoStore = MongoStore.create({
+  mongoUrl: process.env.SESSION_STORE_STRING,
+});
+
+const session_options = {
+  secret: process.env.SECRET_KEY,
+  resave: true,
+  saveUninitialized: true,
+  store: mongoStore
+}
+
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(process.cwd() + '/usl/dist'));
-app.use(session({
-  secret: process.env.SECRET_KEY,
-  resave: true,
-  saveUninitialized: true,
-  store: MongoStore.create({
-    mongoUrl: 'mongodb://usl:DasistkeingutesPasswort@10.0.0.203:27017/sessionStore?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false',
-  })
-}));
+app.use(session(session_options));
 
-/*
-app.get('/api/users', (req, res) => {
-  console.log('api/users called!!!!!!!')
-  res.json(users);
-});
-
-
-app.get("/setCookie", (req, res) => {
-  res.cookie('name', 'value', { maxAge: 900000, httpOnly: true });
-  res.send('cookie set');
-})
-
-app.get('/', (req, res) => {
-  res.sendFile(process.cwd() + '/my-app/dist/index.html');
-});
-*/
 app.listen(port, async () => {
   console.log(`Server listening on the port::${port}`);
 });
@@ -75,7 +63,7 @@ app.get("/api/isLoggedin", async (req, res) => {
 
 app.get("/api/loggout", (req, res) => {
   req.session.destroy();
-  res.send("loggedout")
+  res.json({ error: false, msg: "", loggedin: false, loggedout: true })
 })
 
 async function hashPassword(usrPswdInpt) {
@@ -87,12 +75,3 @@ async function login(req, res, email, uID) {
   req.session.uid = uID;
   res.json({ error: false, msg: "", loggedin: true })
 }
-
-app.get("/test", (req, res) => {
-  req.session.test = true;
-  res.json(req.session + "");
-})
-app.get("/test2", (req, res) => {
-
-  res.json(req.session.test);
-})
