@@ -38,7 +38,7 @@ export default {
   },
   async created(){
     const loggedin = await isLoggedIn();
-    this.state = loggedin?1:1;
+    this.state = loggedin?1:0;
     bus.$on("logIn",async(email,password)=>{
       const loggedin = await isLoggedIn() 
       if(!loggedin){

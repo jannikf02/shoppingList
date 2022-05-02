@@ -12,16 +12,16 @@
               <strong>Einzukaufen:</strong>
             </v-col>
 
-            <v-col v-for="j in 5" :key="`${n}${j}`" cols="12" md="12">
+            <v-col v-for="uncrossed in uncrossedItems" :key="uncrossed.name" cols="12" md="12">
               <v-divider></v-divider>
               <v-sheet height="fit-content">
                 <v-row>
                   <v-col class="d-flex col justify-center align-center">
-                    <div class="itemName">Salami</div>
+                    <div class="itemName">{{uncrossed.name}}</div>
                   </v-col>
                   <v-divider vertical></v-divider>
                   <v-col class="d-flex col justify-center align-center">
-                    <div class="itemCount">5</div>
+                    <div class="itemCount">{{uncrossed.count}}</div>
                   </v-col>
                   <v-divider vertical></v-divider>
                   <v-col class="d-flex col justify-center align-center">
@@ -35,16 +35,16 @@
               <strong>Eingekauft:</strong>
             </v-col>
 
-            <v-col v-for="j in 5" :key="`${n}${j}`" cols="12" md="12">
+            <v-col v-for="crossed in crossedItems" :key="crossed.name" cols="12" md="12">
               <v-divider></v-divider>
               <v-sheet height="fit-content">
                 <v-row>
                   <v-col class="d-flex col justify-center align-center">
-                    <div class="itemName">Salami</div>
+                    <div class="itemName">{{crossed.name}}</div>
                   </v-col>
                   <v-divider vertical></v-divider>
                   <v-col class="d-flex col justify-center align-center">
-                    <div class="itemCount">5</div>
+                    <div class="itemCount">{{crossed.count}}</div>
                   </v-col>
                   <v-divider vertical></v-divider>
                   <v-col class="d-flex col justify-center align-center">
@@ -121,6 +121,13 @@
       ],
       items: [
 
+      ],
+      list:[
+        {name:"Apple",count:5,crossed:false},
+        {name:"Apple2",count:6,crossed:true},
+        {name:"Apple3",count:7,crossed:false},
+        {name:"Apple4",count:8,crossed:true},
+        {name:"Apple5",count:9,crossed:false}
       ]
     }),
     created() {
@@ -140,6 +147,18 @@
       onClickSave() {
         this.dialog = false;
         this.count = 1;
+      }
+    },
+      computed: {
+        uncrossedItems: function() {
+          return this.list.filter(function(u) {
+            return !u.crossed
+        })
+      },
+      crossedItems: function() {
+        return this.list.filter(function(u) {
+          return u.crossed
+        })
       }
     }
     
