@@ -206,7 +206,7 @@ export default {
   },
   computed: {
     getSelectItems: function () {
-      for(let i = 0;i<100;i++)
+      //for(let i = 0;i<100;i++)
     },
     uncrossedItems: function () {
       return this.list.filter(function (u) {
