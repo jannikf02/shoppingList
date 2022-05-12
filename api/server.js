@@ -13,6 +13,7 @@ const MongoStore = require('connect-mongo');
 const fs = require("fs");
 const path = require("path");
 const dotenv = require('dotenv');
+const { ids } = require("webpack");
 dotenv.config();
 
 const app = express(),
@@ -99,15 +100,34 @@ function jsonResult(res, error, msg, loggedin, loggedout) {
   This section is for the shopping list routes
 */
 
-app.get("/api/usl/list", (req, res) => {
+app.get("/api/usl/list", async (req, res) => {
+  /*const data = await mongo.get("user", { _id: req.session.uid });
+  console.log(req.session)
+  if (!req.session.hasOwnProperty("syncDate")) {
+    if (data[0].syncDate == undefined) {
+      req.session.syncDate = Math.floor(Date.now() / 1000);
+      await mongo.insert("user", { _id: req.session.uid }, { syncDate: req.session.syncDate });
+      const listData = mongo.get("list", { ownerMail: req.body.mail });
+      if (listData.length == 0) {
+        await mongo.insert("list", { ownerMail: req.body.mail, list: [] });
+      }
+    }
+  }*/
+  if (req.session.hasOwnProperty("syncDate") == false) {
+    req.session.syncDate = Math.floor(Date.now() / 1000);
+    await mongo.update("user", { _id: req.session.uid }, { syncDate: req.session.syncDate });
+    const listData = mongo.get("list", { ownerMail: req.body.mail });
+    if (listData.length == 0) {
+      await mongo.insert("list", { ownerMail: req.body.mail, list: [] });
+    }
+  }
   mongo.get("list", { ownerMail: req.body.mail }).then(result => {
     res.json(result.list);
   })
 });
 
 app.post("/api/usl/list", (req, res) => {
-  const list = req.body.list;
-
+  const list = req.session.list;
   const result = mongo.get("list", { ownerMail: list.ownerMail });
   if (result.length == 0) {
     mongo.insert("list", list);

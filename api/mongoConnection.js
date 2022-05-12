@@ -49,13 +49,6 @@ async function get(col, select) {
 
 }
 
-async function exmplDta() {
-    const result = await insert("user", { passwordHash: "$2a$12$6Dn6t7DY0dHQp7.hlxpWv.7A8ywfBzxPaGxJh8SOsMo70E3/5bwaC" })
-    const uid = result.insertedIds[0];
-    const result2 = await insert("list", { uid, items: { "Banane": { amount: 5, crossed: false }, "Apfel": { amount: 4, crossed: false }, "Gurke": { amount: 1, crossed: false }, "Feta": { amount: 69, crossed: true } } })
-}
-//exmplDta()
-
 async function insert(col, insert) {
     const client = connection();
     await client.connect();
@@ -66,4 +59,4 @@ async function insert(col, insert) {
     return result;
 }
 
-module.exports = {insert,get,update,remove};
+module.exports = { insert, get, update, remove };
